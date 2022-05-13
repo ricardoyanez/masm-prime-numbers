@@ -26,15 +26,16 @@ TRUE = 1
 				BYTE	"I'll accept orders for up to 200 primes.",13,10,10,0
 
   prompt1		BYTE	"Enter the number of primes to display [",0
-  dash			BYTE	"-",0
+  dash			BYTE	" ... ",0
   prompt2		BYTE	"]: ",0
 
   num			DWORD	?			; number of primes
   mum			DWORD	?
   mun			DWORD	?
-  bprime		DWORD	?
+  lun			DWORD	0           ; count of primes
+  bprime		DWORD	?           ; isPrime boolean
+  bvalid		DWORD	?           ; validate boolean
 
-  bvalid		DWORD	?
   invalid		BYTE	"No primes for you! Number out of range. Try again.",13,10,0
   space			BYTE	"   ",0
 
@@ -124,12 +125,24 @@ _valid:
     RET
   validate ENDP
 
-; loop over num and display if num is a prime number
+;------------------------------------------------------;
+; Name: showPrimes                                     ;
+;                                                      ;
+; Loop over num and display if mum is a prime number.  ;
+;                                                      ;
+; Receives: num holds the number of primes to display. ;
+;------------------------------------------------------;
   showPrimes PROC
+
+	; preserve registers
 	PUSH EAX
+	PUSH EBX
     PUSH ECX
+	PUSH EDX
+
     MOV ECX, num
 	MOV mum, 0
+	MOV lun, 0
 
 _loop:
 	INC mum
@@ -138,18 +151,34 @@ _loop:
 	CMP EBX, 0
 	JE _loop
 
+	; here we have a prime number
+	INC lun
 	MOV EAX, mum
 	CALL WriteDec
 	MOV EDX, OFFSET space
 	CALL WriteString
 
+	; if display 10 prime numbers, new line
+	MOV EDX, 0
+	MOV EAX, lun
+	MOV EBX, 10
+	DIV EBX
+	CMP EDX, 0
+	JG _next
+	CALL CrLf
+_next:
 	LOOP _loop
+
+	; restore registers
+	POP EDX
 	POP ECX
+	POP EBX
 	POP EAX
+
 	RET
   showPrimes ENDP
 
-; --------------------------------------------------------------------------;
+;---------------------------------------------------------------------------;
 ; Name: isPrime                                                             ;
 ;                                                                           ;
 ; Determines if a number is a prime                                         ;
@@ -157,7 +186,7 @@ _loop:
 ; Receives: the global variable mum must hold the prime number.             ;
 ;                                                                           ;
 ; Returns: the global variable bprime is 1 if number is prime, 0 otherwise. ;
-; --------------------------------------------------------------------------;
+;---------------------------------------------------------------------------;
   isPrime PROC
 	; preserve registers
 	PUSH EAX
@@ -177,7 +206,7 @@ _loop:
 	MOV EAX, mum
 	DIV mun
 	CMP EDX, 0
-	; if mum % mun is zero, mum is a not prime
+	; if mum % mun is zero, mum is divisable and not a prime
 	JE _not_prime
 	MOV EAX, mun
 	MOV EBX, 2
