@@ -1,20 +1,22 @@
-TITLE Program Template     (template.asm)
+TITLE Primes     (Proj4_yanezr.asm)
 
 ; Author: Ricardo Yanez
 ; Last Modified: 5/15/2022
 ; OSU email address: yanezr@oregonstate.edu
-; Course number/section:   CS271 Section 404
-; Project Number: 4   Due Date: 5/15/2022
-; Description: This file is provided as a template from which you may work
-;              when developing assembly projects in CS271.
+; Course number/section: CS271 Section 404
+; Project Number: 4 Due Date: 5/15/2022
+; Description: Display prime numbes from 1 to n, where n is user supplied and
+;              less or equal to 200.
 
 INCLUDE Irvine32.inc
-
-; (insert macro definitions here)
 
 ; define limits
 LO = 1
 HI = 200
+
+; define boolean
+FALSE = 0
+TRUE = 1
 
 .data
 
@@ -28,6 +30,9 @@ HI = 200
   prompt2		BYTE	"]: ",0
 
   num			DWORD	?			; number of primes
+  mum			DWORD	?
+  mun			DWORD	?
+  bprime		DWORD	?
 
   valid			DWORD	?
   invalid		BYTE	"No primes for you! Number out of range. Try again.",13,10,0
@@ -93,29 +98,92 @@ _continue:
   ;
   validate PROC
 
-    MOV valid, 1
+	; preserve registers
+	PUSH EAX
+	PUSH EDX
+
+    MOV valid, TRUE
 	CMP num, LO
 	JL _invalid
 	CMP EAX, HI
 	JLE _valid
 
-; number is not in range
+	; number is not in range
 _invalid:
 	MOV EDX, OFFSET invalid
 	CALL WriteString
-    MOV valid, 0
+    MOV valid, FALSE
 
 _valid:
+
+	; restore registers
+	POP EDX
+	POP EAX
 
     RET
   validate ENDP
 
-
+; loop over num and display if num is a prime number
   showPrimes PROC
+	PUSH EAX
+    PUSH ECX
+    MOV ECX, num
+	MOV mum, 0
 
+_loop:
+	INC mum
+    CALL isPrime
+
+	MOV EAX, mum
+	CALL WriteDec
+	call CrLf
+	MOV EAX, bprime
+	CALL WriteDec
+	call CrLf
+
+	LOOP _loop
+	POP ECX
+	POP EAX
 	RET
   showPrimes ENDP
 
+; ---------------------------------
+; Determines if a number is a prime
+; ---------------------------------
+  isPrime PROC
+	PUSH EAX			; preserve registers
+	PUSH EBX
+	PUSH ECX
+	PUSH EDX
+	MOV bprime, FALSE
+	CMP mum, 1
+	JE _not_prime
+	CMP mum, 2
+	JE _is_prime
+    MOV	mun, 2
+_loop1:
+	MOV EDX, 0
+	MOV EAX, mum
+	DIV mun
+	CMP EDX, 0
+	JE _not_prime
+	MOV EAX, mun
+	MOV EBX, 2
+	MUL EBX
+	CMP EAX, mum
+	JG _is_prime
+    INC mun
+	JNE _loop1
+_is_prime:
+	MOV bprime, TRUE
+
+_not_prime:
+	POP EDX				; restore registers
+	POP ECX
+	POP EBX
+	POP EAX
+    RET
+  isPrime ENDP
   farewell PROC
 
 	RET
