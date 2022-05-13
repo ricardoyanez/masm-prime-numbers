@@ -20,14 +20,16 @@ TRUE = 1
 
 .data
 
-  greeting		BYTE	"Prime Numbers Programmed by Ricardo",13,10,10,0
+  greeting		BYTE	"Prime Numbers Programmed by Ricardo Yanez",13,10,10,0
 
   instruct		BYTE	"Enter the number of prime numbers you would like to see.",13,10
 				BYTE	"I'll accept orders for up to 200 primes.",13,10,10,0
 
   prompt1		BYTE	"Enter the number of primes to display [",0
-  dash			BYTE	" ... ",0
   prompt2		BYTE	"]: ",0
+
+  dots			BYTE	" ... ",0
+  space			BYTE	"   ",0
 
   num			DWORD	?			; number of primes
   mum			DWORD	?
@@ -37,7 +39,8 @@ TRUE = 1
   bvalid		DWORD	?           ; validate boolean
 
   invalid		BYTE	"No primes for you! Number out of range. Try again.",13,10,0
-  space			BYTE	"   ",0
+
+  prompt3		BYTE	"Results certified by Ricardo Yanez. Goodbye.",13,10,0
 
 .code
 main PROC
@@ -50,14 +53,42 @@ main PROC
   Invoke ExitProcess,0	; exit to operating system
 main ENDP
 
+
+;------------------------------------------------------;
+; Name: introduction                                   ;
+;                                                      ;
+; Display program title and instructions.              ;
+;                                                      ;
+; Preconditions: prompt string must have been defined. ;
+;------------------------------------------------------;
   introduction PROC
-    MOV EDX, OFFSET greeting	; display greeting
+	; preserve registers
+	PUSH EDX
+
+	MOV EDX, OFFSET greeting	; display greeting
 	CALL WriteString
+
+	; restore registers
+	POP EDX
 	RET
   introduction ENDP
 
+
+; -----------------------------------------------------;
+; Name: getUserData                                    ;
+;                                                      ;
+; Get the input from user.                             ;
+;                                                      ;
+; Preconditions: prompt string must have been defined. ;
+;                                                      ;
+; Postconditions: num is within the range.             ;
+; -----------------------------------------------------;
   getUserData PROC
-    MOV EDX, OFFSET instruct	; display instructions
+
+	; preserve registers
+	PUSH EDX
+
+	MOV EDX, OFFSET instruct	; display instructions
 	CALL WriteString
 
 _start:
@@ -68,67 +99,95 @@ _start:
 	JMP _start
 _continue:
 
+	; restore registers
+	POP EDX
+
 	RET
   getUserData ENDP
 
-  ;
-  ; procedure get value
-  ;
+;------------------------------------------------------;
+; Name: getValue                                       ;
+;                                                      ;
+; Prompt and read for a user supplied value.           ;
+;                                                      ;
+; Preconditions: prompt string must have been defined. ;
+;                                                      ;
+; Returns: num, the user input.                        ;
+;------------------------------------------------------;
   getValue PROC
+
+	; preserve registers
+	PUSH EAX
+	PUSH EDX
+
 	; display prompt with limits
 	MOV EDX, OFFSET prompt1
 	CALL WriteString
 	MOV EAX, LO
 	CALL WriteDec
-	MOV EDX, OFFSET dash
+	MOV EDX, OFFSET dots
 	CALL WriteString
 	MOV EAX, HI
 	CALL WriteDec
 	MOV EDX, OFFSET prompt2
 	CALL WriteString
 
-	; get value
+	; read the value
 	CALL ReadDec
 	MOV num, EAX
-
-	RET
-  getValue ENDP
-
-  ;
-  ; procedure validate
-  ; validate number in [LO-HI] range
-  ;
-  validate PROC
-
-	; preserve registers
-	PUSH EAX
-	PUSH EDX
-
-    MOV bvalid, TRUE
-	CMP num, LO
-	JL _invalid
-	CMP EAX, HI
-	JLE _valid
-
-	; number is not in range
-_invalid:
-	MOV EDX, OFFSET invalid
-	CALL WriteString
-    MOV bvalid, FALSE
-
-_valid:
 
 	; restore registers
 	POP EDX
 	POP EAX
 
-    RET
+	RET
+  getValue ENDP
+
+
+;
+;--------------------------------------------------------------;
+; Name: validate                                               ;
+;                                                              ;
+; Validate number in the [LO-HI] range                         ;
+;                                                              ;
+; Preconditions: prompt strings must have been defined.        ;
+;                                                              ;
+; Receives: num, the number of primes to display               ;
+;                                                              ;
+; Returns: Boloean bvalid, 1 if within the range, 0 otherwise. ;
+;--------------------------------------------------------------;
+  validate PROC
+
+	; preserve registers
+	PUSH EDX
+
+	MOV bvalid, TRUE
+	CMP num, LO
+	JL _invalid
+	CMP num, HI
+	JLE _valid
+
+	; number is not in range
+  _invalid:
+	MOV EDX, OFFSET invalid
+	CALL WriteString
+	MOV bvalid, FALSE
+
+  _valid:
+
+	; restore registers
+	POP EDX
+
+	RET
   validate ENDP
+
 
 ;------------------------------------------------------;
 ; Name: showPrimes                                     ;
 ;                                                      ;
 ; Loop over num and display if mum is a prime number.  ;
+;                                                      ;
+; Preconditions: prompt string must have been defined. ;
 ;                                                      ;
 ; Receives: num holds the number of primes to display. ;
 ;------------------------------------------------------;
@@ -140,13 +199,13 @@ _valid:
     PUSH ECX
 	PUSH EDX
 
-    MOV ECX, num
+	MOV ECX, num
 	MOV mum, 0
 	MOV lun, 0
 
-_loop:
+  _loop:
 	INC mum
-    CALL isPrime
+	CALL isPrime
 	MOV EBX, bprime
 	CMP EBX, 0
 	JE _loop
@@ -166,8 +225,15 @@ _loop:
 	CMP EDX, 0
 	JG _next
 	CALL CrLf
-_next:
+  _next:
 	LOOP _loop
+	CALL CrLf
+
+	; extra line if not starting a new line
+	CMP EDX, 0
+	JE _next1
+	CALL CrLf
+  _next1:
 
 	; restore registers
 	POP EDX
@@ -177,6 +243,7 @@ _next:
 
 	RET
   showPrimes ENDP
+
 
 ;---------------------------------------------------------------------------;
 ; Name: isPrime                                                             ;
@@ -201,7 +268,7 @@ _next:
 	JE _is_prime
     MOV	mun, 2
 	; loop from 2 to mum/2
-_loop:
+  _loop:
 	MOV EDX, 0
 	MOV EAX, mum
 	DIV mun
@@ -215,10 +282,10 @@ _loop:
 	JG _is_prime
     INC mun
 	JNE _loop
-_is_prime:
+  _is_prime:
 	MOV bprime, TRUE
 
-_not_prime:
+  _not_prime:
 
 	; restore registers
 	POP EDX
@@ -229,8 +296,22 @@ _not_prime:
   isPrime ENDP
 
 
+;------------------------------------------------------;
+; Name: farewell                                       ;
+;                                                      ;
+; Display end credits                                  ;
+;                                                      ;
+; Preconditions: prompt string must have been defined. ;
+;------------------------------------------------------;
   farewell PROC
+	; preserve registers
+	PUSH EDX
 
+	MOV EDX, OFFSET prompt3
+	CALL WriteString
+
+	; restore registers
+	POP EDX
 	RET
   farewell ENDP
 
