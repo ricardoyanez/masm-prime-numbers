@@ -34,8 +34,9 @@ TRUE = 1
   mun			DWORD	?
   bprime		DWORD	?
 
-  valid			DWORD	?
+  bvalid		DWORD	?
   invalid		BYTE	"No primes for you! Number out of range. Try again.",13,10,0
+  space			BYTE	"   ",0
 
 .code
 main PROC
@@ -61,7 +62,7 @@ main ENDP
 _start:
 	CALL getValue
 	CALL validate
-	CMP valid, 0
+	CMP bvalid, FALSE
 	JG _continue
 	JMP _start
 _continue:
@@ -102,7 +103,7 @@ _continue:
 	PUSH EAX
 	PUSH EDX
 
-    MOV valid, TRUE
+    MOV bvalid, TRUE
 	CMP num, LO
 	JL _invalid
 	CMP EAX, HI
@@ -112,7 +113,7 @@ _continue:
 _invalid:
 	MOV EDX, OFFSET invalid
 	CALL WriteString
-    MOV valid, FALSE
+    MOV bvalid, FALSE
 
 _valid:
 
@@ -133,13 +134,14 @@ _valid:
 _loop:
 	INC mum
     CALL isPrime
+	MOV EBX, bprime
+	CMP EBX, 0
+	JE _loop
 
 	MOV EAX, mum
 	CALL WriteDec
-	call CrLf
-	MOV EAX, bprime
-	CALL WriteDec
-	call CrLf
+	MOV EDX, OFFSET space
+	CALL WriteString
 
 	LOOP _loop
 	POP ECX
@@ -147,25 +149,35 @@ _loop:
 	RET
   showPrimes ENDP
 
-; ---------------------------------
-; Determines if a number is a prime
-; ---------------------------------
+; --------------------------------------------------------------------------;
+; Name: isPrime                                                             ;
+;                                                                           ;
+; Determines if a number is a prime                                         ;
+;                                                                           ;
+; Receives: the global variable mum must hold the prime number.             ;
+;                                                                           ;
+; Returns: the global variable bprime is 1 if number is prime, 0 otherwise. ;
+; --------------------------------------------------------------------------;
   isPrime PROC
-	PUSH EAX			; preserve registers
+	; preserve registers
+	PUSH EAX
 	PUSH EBX
 	PUSH ECX
 	PUSH EDX
+
 	MOV bprime, FALSE
-	CMP mum, 1
+	CMP mum, 1          ; 1 is not a prime number
 	JE _not_prime
-	CMP mum, 2
+	CMP mum, 2          ; 2 is a prime number
 	JE _is_prime
     MOV	mun, 2
-_loop1:
+	; loop from 2 to mum/2
+_loop:
 	MOV EDX, 0
 	MOV EAX, mum
 	DIV mun
 	CMP EDX, 0
+	; if mum % mun is zero, mum is a not prime
 	JE _not_prime
 	MOV EAX, mun
 	MOV EBX, 2
@@ -173,17 +185,21 @@ _loop1:
 	CMP EAX, mum
 	JG _is_prime
     INC mun
-	JNE _loop1
+	JNE _loop
 _is_prime:
 	MOV bprime, TRUE
 
 _not_prime:
-	POP EDX				; restore registers
+
+	; restore registers
+	POP EDX
 	POP ECX
 	POP EBX
 	POP EAX
     RET
   isPrime ENDP
+
+
   farewell PROC
 
 	RET
