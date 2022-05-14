@@ -31,10 +31,11 @@ TRUE = 1
   dash			BYTE	"-",0
   space			BYTE	" ",0
 
-  num			DWORD	?			; number of primes
-  mum			DWORD	?
-  mun			DWORD	?
+  num			DWORD	?			; number of primes to display
+  mum			DWORD	?			; internal variable for isprime
+  mun			DWORD	?			; internal variable for isprime
   lun			DWORD	0           ; count primes
+
   bprime		DWORD	?           ; prime boolean
   bvalid		DWORD	?           ; validate boolean
 
@@ -69,8 +70,7 @@ main ENDP
 ;-------------------------------------------------------;
   introduction PROC
 
-	; preserve registers
-	PUSH EDX
+	PUSH EDX	; preserve registers
 
 	;-----------------
 	; display greeting
@@ -92,8 +92,7 @@ main ENDP
 	MOV EDX, OFFSET instruct
 	CALL WriteString
 
-	; restore registers
-	POP EDX
+	POP EDX		; restore registers
 
 	RET
   introduction ENDP
@@ -137,8 +136,7 @@ main ENDP
 ;-------------------------------------------------------;
   getValue PROC
 
-	; preserve registers
-	PUSH EAX
+	PUSH EAX	; preserve registers
 	PUSH EDX
 
 	;---------------------------
@@ -161,8 +159,7 @@ main ENDP
 	CALL ReadDec
 	MOV num, EAX
 
-	; restore registers
-	POP EDX
+	POP EDX		; restore registers
 	POP EAX
 
 	RET
@@ -183,8 +180,7 @@ main ENDP
 ;--------------------------------------------------------------;
   validate PROC
 
-	; preserve registers
-	PUSH EDX
+	PUSH EDX	; preserve registers
 
 	; --------------------------------
 	; check if num is within the range
@@ -206,8 +202,7 @@ main ENDP
 
   _valid:
 
-	; restore registers
-	POP EDX
+	POP EDX		; restore registers
 
 	RET
   validate ENDP
@@ -224,8 +219,7 @@ main ENDP
 ;------------------------------------------------------;
   showPrimes PROC
 
-	; preserve registers
-	PUSH EAX
+	PUSH EAX	; preserve registers
 	PUSH EBX
 	PUSH ECX
 	PUSH EDX
@@ -301,8 +295,7 @@ main ENDP
 
   _done:
 
-	; restore registers
-	POP EDX
+	POP EDX		; restore registers
 	POP ECX
 	POP EBX
 	POP EAX
@@ -322,8 +315,7 @@ main ENDP
 ;------------------------------------------------------;
   WriteSpace PROC
 
-	; preserve registers
-	PUSH EAX
+	PUSH EAX	; preserve registers
 	PUSH EBX
 	PUSH EDX
 
@@ -358,8 +350,7 @@ main ENDP
 	JMP _loop
   _done:
 
-	; restore registers
-	POP EDX
+	POP EDX		; restore registers
 	POP EBX
 	POP EAX
 
@@ -378,8 +369,7 @@ main ENDP
 ;----------------------------------------------------------------------------;
   isPrime PROC
 
-	; preserve registers
-	PUSH EAX
+	PUSH EAX	; preserve registers
 	PUSH EBX
 	PUSH ECX
 	PUSH EDX
@@ -426,8 +416,7 @@ main ENDP
 
   _not_prime:
 
-	; restore registers
-	POP EDX
+	POP EDX		; restore registers
 	POP ECX
 	POP EBX
 	POP EAX
@@ -445,8 +434,7 @@ main ENDP
 ;------------------------------------------------------;
   farewell PROC
 
-	; preserve registers
-	PUSH EDX
+	PUSH EDX	; preserve registers
 
 	;--------------------
 	; display end credits
@@ -454,8 +442,7 @@ main ENDP
 	MOV EDX, OFFSET prompt3
 	CALL WriteString
 
-	; restore registers
-	POP EDX
+	POP EDX		; restore registers
 
 	RET
   farewell ENDP
