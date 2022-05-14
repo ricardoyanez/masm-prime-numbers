@@ -5,14 +5,14 @@ TITLE Display Prime Numbers     (Proj4_yanezr.asm)
 ; OSU email address: yanezr@oregonstate.edu
 ; Course number/section: CS271 Section 404
 ; Project Number: 4 Due Date: 5/15/2022
-; Description: Display prime numbes from 1 to n, where n is user supplied and
-;              less or equal to 200.
+; Description: Display prime numbers from 1 to n, where n is user supplied and
+;              less or equal to 200 (extended to 4000 as per Extra Credit).
 
 INCLUDE Irvine32.inc
 
 ; define limits
 LO = 1
-HI = 200
+HI = 4000
 
 ; define boolean
 FALSE = 0
@@ -29,7 +29,7 @@ TRUE = 1
   prompt2		BYTE	"]: ",0
 
   dash			BYTE	"-",0
-  space			BYTE	"   ",0
+  space			BYTE	" ",0
 
   num			DWORD	?			; number of primes
   mum			DWORD	?
@@ -42,11 +42,16 @@ TRUE = 1
 
   prompt3		BYTE	"Results certified by Ricardo. Goodbye.",13,10,0
 
+  prompt_ec1	BYTE	"EC: Align the output columns",13,10,0
+  prompt_ec2	BYTE	"EC: Extend the range of primes to display up to 4000 primes",13,10,10,0
+
+  prompt4		BYTE	"Press any key to continue ...",0
+
 .code
 main PROC
 
   CALL introduction		; Display greeting and instructions
-  CALL getUserData		; Get a value and validate 
+  CALL getUserData		; Get a value and validate
   CALL showPrimes		; Display the prime numbers
   CALL farewell			; Display end credits
 
@@ -70,6 +75,14 @@ main ENDP
 	; display greeting
 	;-----------------
 	MOV EDX, OFFSET greeting
+	CALL WriteString
+
+	;-------------
+	; Extra Credit
+	;-------------
+	MOV EDX, OFFSET prompt_ec1
+	CALL WriteString
+	MOV EDX, OFFSET prompt_ec2
 	CALL WriteString
 
 	;---------------------
@@ -172,9 +185,9 @@ main ENDP
 	; preserve registers
 	PUSH EDX
 
-	; ---------------------------------
-	; check if num is withing the range
-	; ---------------------------------
+	; --------------------------------
+	; check if num is within the range
+	; --------------------------------
 	MOV bvalid, TRUE
 	CMP num, LO
 	JL _invalid
@@ -223,6 +236,7 @@ main ENDP
 	MOV ECX, num
 	MOV mum, 0
 	MOV lun, 0
+	CALL CrLf
 
 	;----------------------------
 	; loop and check if tentative
@@ -243,8 +257,7 @@ main ENDP
 	INC lun
 	MOV EAX, mum
 	CALL WriteDec
-	MOV EDX, OFFSET space
-	CALL WriteString
+	CALL WriteSpace
 
 	;--------------------------------------
 	; if multiple of 10 prime numbers
@@ -257,6 +270,23 @@ main ENDP
 	CMP EDX, 0
 	JG _next
 	CALL CrLf
+
+	;------------------------------------
+	; if multiple of 200 prime numbers
+	; have been displayed, issue a prompt
+	; to continue
+	;------------------------------------
+	MOV EDX, 0
+	MOV EAX, lun
+	MOV EBX, 200
+	DIV EBX
+	CMP EDX, 0
+	JG _next
+	MOV EDX, OFFSET prompt4
+	CALL WriteString
+	CALL ReadChar
+	CALL CrLf
+
   _next:
 	LOOP _loop
 	CALL CrLf
@@ -278,6 +308,71 @@ main ENDP
 
 	RET
   showPrimes ENDP
+
+
+;------------------------------------------------------;
+; Name: WriteSpace                                     ;
+;                                                      ;
+; Fill spaces depending on the number of digits        ;
+;                                                      ;
+; Preconditions: prompt string must have been defined. ;
+;                                                      ;
+; Receives: mum holds the prime number to display.     ;
+;------------------------------------------------------;
+  WriteSpace PROC
+
+	; preserve registers
+	PUSH EAX
+	PUSH EBX
+	PUSH EDX
+
+	MOV EDX, OFFSET space
+	CALL WriteString
+
+	MOV EDX, 0
+	MOV EAX, mum
+	MOV EBX, 10000
+	DIV EBX
+	CMP EAX, 0
+	JG _spc1
+	MOV EDX, OFFSET space
+	CALL WriteString
+  _spc1:
+	MOV EDX, 0
+	MOV EAX, mum
+	MOV EBX, 1000
+	DIV EBX
+	CMP EAX, 0
+	JG _spc2
+	MOV EDX, OFFSET space
+	CALL WriteString
+  _spc2:
+	MOV EDX, 0
+	MOV EAX, mum
+	MOV EBX, 100
+	DIV EBX
+	CMP EAX, 0
+	JG _spc3
+	MOV EDX, OFFSET space
+	CALL WriteString
+  _spc3:
+	MOV EDX, 0
+	MOV EAX, mum
+	MOV EBX, 10
+	DIV EBX
+	CMP EAX, 0
+	JG _spc4
+	MOV EDX, OFFSET space
+	CALL WriteString
+  _spc4:
+
+	; restore registers
+	POP EDX
+	POP EBX
+	POP EAX
+
+	RET
+  WriteSpace ENDP
 
 
 ;----------------------------------------------------------------------------;
@@ -304,7 +399,7 @@ main ENDP
 	;-----------------------
 	CMP mum, 1		; 1 is not a prime number
 	JE _not_prime
-	CMP mum, 2      ; 2 is a prime number
+	CMP mum, 2		; 2 is a prime number
 	JE _is_prime
 	MOV	mun, 2
 
