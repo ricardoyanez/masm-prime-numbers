@@ -45,7 +45,8 @@ TRUE = 1
   prompt_ec1	BYTE	"EC: Align the output columns",13,10,0
   prompt_ec2	BYTE	"EC: Extend the range of primes to display up to 4000 primes",13,10,10,0
 
-  prompt4		BYTE	"Press any key to continue ...",0
+  prompt4		BYTE	"Press any key to continue... ",0
+  pow10			DWORD	?
 
 .code
 main PROC
@@ -329,42 +330,33 @@ main ENDP
 	MOV EDX, OFFSET space
 	CALL WriteString
 
+	;---------------------------------------------
+	; divide the number by decreasing powers of 10
+	; if integer part is zero, print a space
+	;---------------------------------------------
+	MOV pow10, 10000
+  _loop:
 	MOV EDX, 0
 	MOV EAX, mum
-	MOV EBX, 10000
+	MOV EBX, pow10
 	DIV EBX
 	CMP EAX, 0
-	JG _spc1
+	JG _jump
 	MOV EDX, OFFSET space
 	CALL WriteString
-  _spc1:
+  _jump:
+	;-----------------------------
+	; decrease the exponent by one
+	;-----------------------------
 	MOV EDX, 0
-	MOV EAX, mum
-	MOV EBX, 1000
-	DIV EBX
-	CMP EAX, 0
-	JG _spc2
-	MOV EDX, OFFSET space
-	CALL WriteString
-  _spc2:
-	MOV EDX, 0
-	MOV EAX, mum
-	MOV EBX, 100
-	DIV EBX
-	CMP EAX, 0
-	JG _spc3
-	MOV EDX, OFFSET space
-	CALL WriteString
-  _spc3:
-	MOV EDX, 0
-	MOV EAX, mum
+	MOV EAX, pow10
 	MOV EBX, 10
 	DIV EBX
-	CMP EAX, 0
-	JG _spc4
-	MOV EDX, OFFSET space
-	CALL WriteString
-  _spc4:
+	CMP EAX, 1
+	JE _done
+	MOV pow10, EAX
+	JMP _loop
+  _done:
 
 	; restore registers
 	POP EDX
