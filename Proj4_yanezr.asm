@@ -260,11 +260,10 @@ main ENDP
 	MOV lun, 0
 	CALL CrLf
 
-	;----------------------------
-	; loop and check if tentative
-	; number is a prime
-	; it it is, continue
-	;----------------------------
+	;-----------------------------------
+	; loop and check if tentative number
+	; is a prime. if it is, continue
+	;-----------------------------------
   _loop:
 	INC mum
 	CALL isPrime
@@ -293,11 +292,10 @@ main ENDP
 	JG _next
 	CALL CrLf
 
-	;------------------------------------
-	; if multiple of 200 prime numbers
-	; have been displayed, issue a prompt
-	; to continue
-	;------------------------------------
+	;-------------------------------------------
+	; if multiple of 200 prime numbers have
+	; been displayed, issue a prompt to continue
+	;-------------------------------------------
 	MOV EDX, 0
 	MOV EAX, lun
 	MOV EBX, 200
