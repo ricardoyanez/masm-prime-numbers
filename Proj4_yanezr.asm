@@ -61,13 +61,21 @@ main PROC
 main ENDP
 
 
-;-------------------------------------------------------;
-; Name: introduction                                    ;
-;                                                       ;
-; Display program title and instructions.               ;
-;                                                       ;
-; Preconditions: prompt strings must have been defined. ;
-;-------------------------------------------------------;
+;---------------------------------------------------;
+; Name: introduction                                ;
+;                                                   ;
+; Display program title and instructions.           ;
+;                                                   ;
+; Preconditions: strings greeting, instruct,        ;
+;                prompt_ec1 and prompt_ec2 declared ;
+;                                                   ;
+; Postconditions: none                              ;
+;                                                   ;
+; Receives: global variables greeting, instruct,    ;
+;                  prompt_ec1 and prompt_ec2        ;
+;                                                   ;
+; Returns: none                                     ;
+;---------------------------------------------------;
   introduction PROC
 
 	PUSH EDX	; preserve registers
@@ -98,15 +106,19 @@ main ENDP
   introduction ENDP
 
 
-; -----------------------------------------------------;
-; Name: getUserData                                    ;
-;                                                      ;
-; Get the input from user.                             ;
-;                                                      ;
-; Preconditions: prompt string must have been defined. ;
-;                                                      ;
-; Postconditions: input num is within the range.       ;
-; -----------------------------------------------------;
+; -------------------------------------------------------;
+; Name: getUserData                                      ;
+;                                                        ;
+; Get the input from user.                               ;
+;                                                        ;
+; Preconditions: boolean global variable bvalid declared ;
+;                                                        ;
+; Postconditions: input variable num is within the range ;
+;                                                        ;
+; Receives: none                                         ;
+;                                                        ;
+; Returns: none                                          ;
+; -------------------------------------------------------;
   getUserData PROC
 
 	;--------------------------
@@ -125,15 +137,21 @@ main ENDP
   getUserData ENDP
 
 
-;-------------------------------------------------------;
-; Name: getValue                                        ;
-;                                                       ;
-; Prompt and read a user supplied value.                ;
-;                                                       ;
-; Preconditions: prompt strings must have been defined. ;
-;                                                       ;
-; Returns: num, the user input.                         ;
-;-------------------------------------------------------;
+;------------------------------------------------------;
+; Name: getValue                                       ;
+;                                                      ;
+; Prompt and read a user supplied value.               ;
+;                                                      ;
+; Preconditions: prompt strings prompt_1, prompt_2 and ;
+;                dash declared. global variable num    ;
+;                declared. constants LO, HI defined    ;
+;                                                      ;
+; Postconditions: none                                 ;
+;                                                      ;
+; Receives: none                                       ;
+;                                                      ;
+; Returns: num, the user input.                        ;
+;------------------------------------------------------;
   getValue PROC
 
 	PUSH EAX	; preserve registers
@@ -167,17 +185,21 @@ main ENDP
 
 
 ;
-;--------------------------------------------------------------;
-; Name: validate                                               ;
-;                                                              ;
-; Validate number in the [LO-HI] range                         ;
-;                                                              ;
-; Preconditions: prompt strings must have been defined.        ;
-;                                                              ;
-; Receives: num, the number of primes to display               ;
-;                                                              ;
-; Returns: Boolean bvalid, 1 if within the range, 0 otherwise. ;
-;--------------------------------------------------------------;
+;-------------------------------------------------------------;
+; Name: validate                                              ;
+;                                                             ;
+; Validate number in the [LO-HI] range                        ;
+;                                                             ;
+; Preconditions: prompt string invalid declared.              ;
+;                boolean global variable bvalid declared.     ;
+;                constants LO, HI defined                     ;
+;                                                             ;
+; Postconditions: none                                        ;
+;                                                             ;
+; Receives: num, the number of primes to display              ;
+;                                                             ;
+; Returns: Boolean bvalid, 1 if within the range, 0 otherwise ;
+;-------------------------------------------------------------;
   validate PROC
 
 	PUSH EDX	; preserve registers
@@ -208,15 +230,20 @@ main ENDP
   validate ENDP
 
 
-;------------------------------------------------------;
-; Name: showPrimes                                     ;
-;                                                      ;
-; Loop over num and display if mum is a prime number.  ;
-;                                                      ;
-; Preconditions: prompt string must have been defined. ;
-;                                                      ;
-; Receives: num holds the number of primes to display. ;
-;------------------------------------------------------;
+;--------------------------------------------------------;
+; Name: showPrimes                                       ;
+;                                                        ;
+; Loop over num and display if mum is a prime number.    ;
+;                                                        ;
+; Preconditions: global variables mum and lin declared.  ;
+;                boolean global bprime variable declared ;
+;                                                        ;
+; Postconditions: none                                   ;
+;                                                        ;
+; Receives: num holds the number of primes to display    ;
+;                                                        ;
+; Returns: none                                          ;
+;--------------------------------------------------------;
   showPrimes PROC
 
 	PUSH EAX	; preserve registers
@@ -309,9 +336,13 @@ main ENDP
 ;                                                      ;
 ; Fill spaces depending on the number of digits        ;
 ;                                                      ;
-; Preconditions: prompt string must have been defined. ;
+; Preconditions: global variabel pow10 declared        ;
 ;                                                      ;
-; Receives: mum holds the prime number to display.     ;
+; Postconditions: none                                 ;
+;                                                      ;
+; Receives: string space, mum holds the prime number   ;
+;                                                      ;
+; Returns: none                                        ;
 ;------------------------------------------------------;
   WriteSpace PROC
 
@@ -358,15 +389,21 @@ main ENDP
   WriteSpace ENDP
 
 
-;----------------------------------------------------------------------------;
-; Name: isPrime                                                              ;
-;                                                                            ;
-; Determines if a number is a prime                                          ;
-;                                                                            ;
-; Receives: the global variable mum must hold the prime number.              ;
-;                                                                            ;
-; Returns: the boolean variable bprime is 1 if number is prime, 0 otherwise. ;
-;----------------------------------------------------------------------------;
+;---------------------------------------------------------;
+; Name: isPrime                                           ;
+;                                                         ;
+; Determines if a number is a prime                       ;
+;                                                         ;
+; Preconditions: global variable mun declared             ;
+;                                                         ;
+; Postconditions: none                                    ;
+;                                                         ;
+; Receives: the global variable mum must hold the number  ;
+;           to test                                       ;
+;                                                         ;
+; Returns: the boolean variable bprime is 1 if mun is     ;
+;          prime, 0 otherwise.                            ;
+;---------------------------------------------------------;
   isPrime PROC
 
 	PUSH EAX	; preserve registers
@@ -425,13 +462,19 @@ main ENDP
   isPrime ENDP
 
 
-;------------------------------------------------------;
-; Name: farewell                                       ;
-;                                                      ;
-; Display end credits                                  ;
-;                                                      ;
-; Preconditions: prompt string must have been defined. ;
-;------------------------------------------------------;
+;-------------------------------------------------------;
+; Name: farewell                                        ;
+;                                                       ;
+; Display end credits                                   ;
+;                                                       ;
+; Preconditions: string prompt3 defined                 ;
+;                                                       ;
+; Postconditions: none                                  ;
+;                                                       ;
+; Receives: prompt3 string global variable              ;
+;                                                       ;
+; Returns: none                                         ;
+;-------------------------------------------------------;
   farewell PROC
 
 	PUSH EDX	; preserve registers
